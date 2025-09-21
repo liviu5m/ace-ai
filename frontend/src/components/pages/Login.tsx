@@ -23,7 +23,20 @@ const Login = () => {
       navigate("/");
     },
     onError: (err: AxiosError) => {
-      toast(err.response?.data as string);
+      const responseData = err.response?.data;
+
+      let errorMessage: string = "An unexpected error occurred";
+      if (typeof responseData === "string") {
+        errorMessage = responseData;
+      } else if (typeof responseData === "object" && responseData !== null) {
+        const values = Object.values(responseData);
+        if (values.length > 0 && typeof values[0] === "string") {
+          errorMessage = values[0];
+        } else if (values.length > 0) {
+          errorMessage = String(values[0]);
+        }
+      }
+      toast(errorMessage);
     },
   });
   return (
@@ -82,7 +95,7 @@ const Login = () => {
         </form>
         <p className="mt-7 text-center">
           Don't have an account ?{" "}
-          <Link to="/signup" className="text-[#2563EB] font-semibold">
+          <Link to="/auth/signup" className="text-[#2563EB] font-semibold">
             Sign Up
           </Link>
         </p>

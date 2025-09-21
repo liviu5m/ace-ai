@@ -31,14 +31,20 @@ public class AuthenticationService {
     }
 
     public User signup(RegisterUserDto registerUserDto) {
-        if(!registerUserDto.getPassword().equals(registerUserDto.getPasswordConfirmation())) throw new RuntimeException("Passwords do not match");
-        User user = new User(registerUserDto.getEmail(), registerUserDto.getName(), passwordEncoder.encode(registerUserDto.getPassword()));
-        user.setVerificationCode(generateVerificationCode());
-        user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(5));
-        user.setEnabled(false);
-        userRepository.save(user);
-        emailService.sendVerificationEmailTemplate(user);
-        return user;
+        try {
+            if(!registerUserDto.getPassword().equals(registerUserDto.getPasswordConfirmation())) throw new RuntimeException("Passwords do not match");
+            Optional<User> userEmail = userRepository.findByEmail(registerUserDto.getEmail());
+            if(userEmail.isPresent()) throw new RuntimeException("User with this email already exists");
+            User user = new User(registerUserDto.getEmail(), registerUserDto.getName(), passwordEncoder.encode(registerUserDto.getPassword()));
+            user.setVerificationCode(generateVerificationCode());
+            user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(5));
+            user.setEnabled(false);
+            userRepository.save(user);
+            emailService.sendVerificationEmailTemplate(user);
+            return user;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public User authenticate(LoginUserDto loginUserDto) {

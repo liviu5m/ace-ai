@@ -1,11 +1,11 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { resendVerificationCode, verifyUser } from "@/api/user";
 import { toast, ToastContainer } from "react-toastify";
@@ -16,13 +16,14 @@ const Verify = () => {
   const { id } = useParams<{ id: string }>();
   const [error, setError] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { mutate: verifyCode } = useMutation({
     mutationKey: ["verifyUser"],
     mutationFn: () => verifyUser(code, id || ""),
     onSuccess: (data) => {
       console.log(data);
-      navigate("/login");
+      navigate("/auth/login");
     },
     onError: (err: AxiosError) => {
       console.log(err.response?.data);
@@ -43,6 +44,13 @@ const Verify = () => {
       toast(err.response?.data as string || "Something went wrong.")
     },
   });
+
+  useEffect(() => {
+    if (!location.state?.fromSignup) {
+      navigate('/auth/signup', { replace: true });
+    }
+  }, [location, navigate]);
+
   return (
     <div className="w-screen h-screen flex items-center justify-center bg-[#F9FAFB]">
       <div className="bg-white shadow p-10 rounded-2xl w-[500px]">

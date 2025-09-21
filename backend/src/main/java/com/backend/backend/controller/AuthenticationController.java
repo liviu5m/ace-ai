@@ -8,11 +8,15 @@ import com.backend.backend.response.LoginResponse;
 import com.backend.backend.services.AuthenticationService;
 import com.backend.backend.services.EmailService;
 import com.backend.backend.services.JwtService;
-import lombok.extern.slf4j.Slf4j;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-@Slf4j
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthenticationController {
@@ -25,17 +29,35 @@ public class AuthenticationController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody RegisterUserDto registerUserDto){
+    public ResponseEntity<?> register(
+            @Valid @RequestBody RegisterUserDto registerUserDto,
+            BindingResult result
+    ) {
+        if (result.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            result.getFieldErrors().forEach(error -> {
+                errors.put(error.getField(), error.getDefaultMessage());
+            });
+            return ResponseEntity.badRequest().body(errors);
+        }
+
         try {
             User registeredUser = authenticationService.signup(registerUserDto);
             return ResponseEntity.ok(registeredUser);
-        }catch (Exception e){
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginUserDto loginUserDto){
+    public ResponseEntity<?> login(@Valid @RequestBody LoginUserDto loginUserDto,BindingResult result){
+        if (result.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            result.getFieldErrors().forEach(error -> {
+                errors.put(error.getField(), error.getDefaultMessage());
+            });
+            return ResponseEntity.badRequest().body(errors);
+        }
         try {
             User authenticatedUser = authenticationService.authenticate(loginUserDto);
             String jwtToken = jwtService.generateToken(authenticatedUser);
@@ -49,7 +71,7 @@ public class AuthenticationController {
     }
 
     @PutMapping("/verify")
-    public ResponseEntity<?> verifyUser(@RequestBody VerifyDto verifyDto){
+    public ResponseEntity<?> verifyUser(@Valid @RequestBody VerifyDto verifyDto){
         try{
             authenticationService.verifyUser(verifyDto);
             return ResponseEntity.ok("Account verified successfully");

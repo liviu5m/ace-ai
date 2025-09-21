@@ -8,6 +8,8 @@ import Verify from "./components/pages/Verify";
 import "react-toastify/dist/ReactToastify.css";
 import { AppProvider } from "./lib/AppContext";
 import Home from "./components/pages/Home";
+import AuthRequiredRoute from "./components/middlewares/AuthRequiredRoute";
+import AuthNotRequiredRoute from "./components/middlewares/AuthNotRequiredRoute";
 
 function App() {
   const queryClient = new QueryClient();
@@ -18,10 +20,28 @@ function App() {
         <AppProvider>
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/verify/:id" element={<Verify />} />
+              <Route
+                path="/*"
+                element={
+                  <AuthRequiredRoute>
+                    <Routes>
+                      <Route path="/" element={<Home />} />
+                    </Routes>
+                  </AuthRequiredRoute>
+                }
+              />
+              <Route
+                path="/auth/*"
+                element={
+                  <AuthNotRequiredRoute>
+                    <Routes>
+                      <Route path="/login" element={<Login />} />
+                      <Route path="/signup" element={<Signup />} />
+                      <Route path="/verify/:id" element={<Verify />} />
+                    </Routes>
+                  </AuthNotRequiredRoute>
+                }
+              />
             </Routes>
           </BrowserRouter>
         </AppProvider>

@@ -12,17 +12,34 @@ const Signup = () => {
     password: "",
     passwordConfirmation: "",
   });
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const { mutate: signUp } = useMutation({
     mutationKey: ["user"],
     mutationFn: () => createUser(userData),
     onSuccess: (data) => {
       console.log(data);
-      navigate("/verify/"+data.id);
+      navigate("/auth/verify/" + data.id, {
+        state: { fromSignup: true },
+      });
     },
     onError: (err: AxiosError) => {
-      toast(err.response?.data as string);
+      const responseData = err.response?.data;
+
+      let errorMessage: string = "An unexpected error occurred";
+      if (typeof responseData === "string") {
+        errorMessage = responseData;
+      } else if (typeof responseData === "object" && responseData !== null) {
+        const values = Object.values(responseData);
+        if (values.length > 0 && typeof values[0] === "string") {
+          errorMessage = values[0];
+        } else if (values.length > 0) {
+          errorMessage = String(values[0]);
+        }
+      }
+      toast(
+        errorMessage
+      );
     },
   });
 
@@ -121,7 +138,7 @@ const Signup = () => {
         </form>
         <p className="mt-7 text-center">
           Already have an account?{" "}
-          <Link to="/login" className="text-[#2563EB] font-semibold">
+          <Link to="/auth/login" className="text-[#2563EB] font-semibold">
             Log In
           </Link>
         </p>
