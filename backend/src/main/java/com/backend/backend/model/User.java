@@ -31,7 +31,7 @@ public class User implements UserDetails {
 
     @Column(nullable = false)
     private String password;
-    private String provider;
+    private String provider = "credentials";
     private Boolean enabled;
     private LocalDateTime verificationCodeExpiresAt;
     private String verificationCode;

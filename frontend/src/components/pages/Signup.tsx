@@ -37,11 +37,14 @@ const Signup = () => {
           errorMessage = String(values[0]);
         }
       }
-      toast(
-        errorMessage
-      );
+      toast(errorMessage);
     },
   });
+
+  const logInWithGoogle = () => {
+    window.location.href =
+      import.meta.env.VITE_API_URL + "/oauth2/authorization/google";
+  };
 
   return (
     <div className="w-screen h-screen flex items-center justify-center bg-[#F9FAFB]">
@@ -136,6 +139,19 @@ const Signup = () => {
             Sign Up
           </button>
         </form>
+        <div className="relative my-5">
+          <hr />
+          <span className="absolute top-1/2 left-1/2 -translate-1/2 bg-white px-4 font-semibold">
+            Or
+          </span>
+        </div>
+        <button
+          className="text-black font-semibold w-full border border-gray-200 rounded-lg py-3 bg-white mt-5 cursor-pointer hover:bg-black hover:text-white flex items-center justify-center gap-5"
+          onClick={() => logInWithGoogle()}
+        >
+          <img src="/imgs/google.png" className="w-7" />
+          <span className="text-lg">Google</span>
+        </button>
         <p className="mt-7 text-center">
           Already have an account?{" "}
           <Link to="/auth/login" className="text-[#2563EB] font-semibold">

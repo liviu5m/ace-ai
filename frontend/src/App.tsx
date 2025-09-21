@@ -10,6 +10,7 @@ import { AppProvider } from "./lib/AppContext";
 import Home from "./components/pages/Home";
 import AuthRequiredRoute from "./components/middlewares/AuthRequiredRoute";
 import AuthNotRequiredRoute from "./components/middlewares/AuthNotRequiredRoute";
+import AuthGoogle from "./components/pages/AuthGoogle";
 
 function App() {
   const queryClient = new QueryClient();
@@ -35,6 +36,7 @@ function App() {
                 element={
                   <AuthNotRequiredRoute>
                     <Routes>
+                      <Route path="/google" element={<AuthGoogle />} />
                       <Route path="/login" element={<Login />} />
                       <Route path="/signup" element={<Signup />} />
                       <Route path="/verify/:id" element={<Verify />} />

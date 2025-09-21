@@ -1,8 +1,8 @@
 import { authenticateUser } from "@/api/user";
 import { useMutation } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const Login = () => {
@@ -13,6 +13,8 @@ const Login = () => {
     passwordConfirmation: "",
   });
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [error, setError] = useState("");
 
   const { mutate: logIn } = useMutation({
     mutationKey: ["user"],
@@ -39,6 +41,18 @@ const Login = () => {
       toast(errorMessage);
     },
   });
+
+  const logInWithGoogle = () => {
+    window.location.href =
+      import.meta.env.VITE_API_URL + "/oauth2/authorization/google";
+  };
+
+  useEffect(() => {
+    setError(searchParams.get("error") || "");
+    searchParams.delete("error");
+    setSearchParams(searchParams);
+  }, []);
+
   return (
     <div className="w-screen h-screen flex items-center justify-center bg-[#F9FAFB]">
       <div className="bg-white shadow p-10 rounded-2xl w-[500px]">
@@ -46,6 +60,12 @@ const Login = () => {
         <h4 className="text-gray-700 text-lg text-center mt-3">
           Sign in to your account
         </h4>
+        {error == "credentials" && (
+          <p className="text-red-500 text-center my-2">
+            You created the account using credentials, you can only log in using
+            credentials.
+          </p>
+        )}
         <form
           className="mt-10"
           onSubmit={(e) => {
@@ -93,6 +113,19 @@ const Login = () => {
             Log In
           </button>
         </form>
+        <div className="relative my-5">
+          <hr />
+          <span className="absolute top-1/2 left-1/2 -translate-1/2 bg-white px-4 font-semibold">
+            Or
+          </span>
+        </div>
+        <button
+          className="text-black font-semibold w-full border border-gray-200 rounded-lg py-3 bg-white mt-5 cursor-pointer hover:bg-black hover:text-white flex items-center justify-center gap-5"
+          onClick={() => logInWithGoogle()}
+        >
+          <img src="/imgs/google.png" className="w-7" />
+          <span className="text-lg">Google</span>
+        </button>
         <p className="mt-7 text-center">
           Don't have an account ?{" "}
           <Link to="/auth/signup" className="text-[#2563EB] font-semibold">
