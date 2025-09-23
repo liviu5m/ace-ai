@@ -1,10 +1,15 @@
-import { useAppContext } from "@/lib/AppContext";
+import BodyLayout from "../layouts/BodyLayout";
+import Hero from "../elements/home/Hero";
+import Info from "../elements/home/Info";
 
 const Home = () => {
-  const { user } = useAppContext();
-  console.log(user);
 
-  return <div>Home</div>;
+  return (
+    <BodyLayout>
+      <Hero />
+      <Info />
+    </BodyLayout>
+  )
 };
 
 export default Home;
